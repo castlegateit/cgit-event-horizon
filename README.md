@@ -30,6 +30,11 @@ $plugin = new \Cgit\EventHorizon('\example.csv');
 $plugin->setTimeFormat('d-m-Y H:i');
 ~~~
 
+The plugin will detect the first timestamp in a given row and use it to "date" the row, but you can specify a column manually if you wish, or if there are multiple timetimes such as for an event booking:
+~~~ php
+$plugin->setManualTimestampColumn(1);
+~~~
+
 The delimiter used to split up rows defaults to a comma, but can also be changed.
 ~~~ php
 // Set Delimiter.

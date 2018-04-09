@@ -40,3 +40,19 @@ The delimiter used to split up rows defaults to a comma, but can also be changed
 // Set Delimiter.
 $plugin->file->setDelimiter('#');
 ~~~
+
+#### Example of handling multiple log files #### 
+
+~~~ php
+$logfiles = [
+    '/home/srv/www/example-site/htdocs/log.csv',
+    '/home/srv/www/example-site/htdocs/log2.csv',
+    '/home/srv/www/example-site-two/htdocs/log.csv',
+    '/home/srv/www/example-site/htdocs/applications.csv',
+];
+
+foreach($logfiles as $logfile) {
+    $EventHorizon = new \Cgit\EventHorizon('logfile');
+    $EventHorizon->ensureCompliance();
+}
+~~~

@@ -20,7 +20,6 @@ class EventHorizon
     
     public function __construct($filePath, $timeLimit = null)
     {
-        echo $filePath;
         $this->registerCSV($filePath, $timeLimit);
         $this->timeFormat = 'Y-m-d H:i';
         $this->file = new FileHandler($this->filePath, $this);

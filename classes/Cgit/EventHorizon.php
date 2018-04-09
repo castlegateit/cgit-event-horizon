@@ -18,24 +18,63 @@ class EventHorizon
     
     public $file;
     
+    public $manualTimestampColumn;
+    
+    /**
+     * Constructor
+     *
+     * Instantiates the class by making sure there's a valid file to read/write to before creating the file-handling object.
+     *
+     * @return void
+     */
     public function __construct($filePath, $timeLimit = null)
     {
-        echo $filePath;
         $this->registerCSV($filePath, $timeLimit);
         $this->timeFormat = 'Y-m-d H:i';
         $this->file = new FileHandler($this->filePath, $this);
     }
     
-    public function ensureCompliance() {
+    
+    /**
+     * Runs the CSV inspection and truncation process.
+     */
+    public function ensureCompliance()
+    {
         $this->file->iterateRows();
     }
     
-    public function setTimeFormat($format = null) {
+    /**
+     * Set the time format for timestamps in the script so that .
+     *
+     * @param string $format Any valid timestamp format compatible with the DateTime class.
+     *
+     * @return void
+     */
+    public function setTimeFormat($format = null)
+    {
         if(!is_null($timeFormat)) {
             $this->timeFormat = $format;
         }
     }
     
+    /**
+     * Manually set the column to use for a timestamp.
+     *
+     * @param $column
+     */
+    public function setManualTimestampColumn($column)
+    {
+        $this->manualTimestampColumn = $column;
+    }
+    
+    /**
+     * Checks if the provided file exists and sets a default time limit if one is not set.
+     *
+     * @param string $filePath A path to the file to be operated on.
+     * @param int $timeLimit A time limit beyond which to remove rows, expressed in seconds.
+     *
+     * @return void
+     */
     public function registerCSV($filePath, $timeLimit = null)
     {
         if(is_null($timeLimit)) {
@@ -52,9 +91,20 @@ class EventHorizon
         $this->horizon = $timeLimit;
     }
     
+    /**
+     * Iterates over a CSV row to find the first cell containing a timestamp. Can be overridden to fetch a specific column.
+     *
+     * @param $array $row CSV row, formatted as an array for iteration.
+     *
+     * @return \DateTime
+     */
     public function retrieveTimeCell($row = null)
     {
-      
+        
+        if(isset($this->manualTimestampColumn)) {
+            return $row[$this->manualTimestampColumn];
+        }
+        
         foreach($row as $cell) {
             if(strtotime($cell)) {
                 return $cell;
@@ -64,12 +114,17 @@ class EventHorizon
         trigger_error('There was an invalid or unreadable timestamp detected. Please manually review the
             output at the specified file path. The row will NOT be deleted.', E_USER_WARNING);
         
-        return new \DateTime('now');
+        return date($this->timeFormat);
         
     }
-    
-    // Returns false if truncation is necessary, true if not.
-    public function evalRowTime($row) {
+   
+    /**
+     * Evaluates a given row's timestamp to see if the row should be removed or retained.
+     *
+     * @param $row Given CSV row.
+     *
+     * @return bool True if row is to be kept, false if row should be removed.
+     */public function evalRowTime($row) {
         $nowTime = new \DateTime('now');
         $this->coerceTimeFormat($this->retrieveTimeCell($row));
         /** @noinspection PhpUndefinedMethodInspection */
@@ -82,6 +137,11 @@ class EventHorizon
         return true;
     }
     
+    /**
+     * Takes a string timestamp and converts it into a DateTime object we can use internally.
+     *
+     * @param $timeCell
+     */
     public function coerceTimeFormat($timeCell) {
         $time = \DateTime::createFromFormat($this->timeFormat, $timeCell);
         $this->time = $time;

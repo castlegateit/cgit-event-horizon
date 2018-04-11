@@ -40,7 +40,10 @@ class EventHorizon
      */
     public function ensureCompliance()
     {
-        $this->file->iterateRows();
+        if($this->file->getPointer()) {
+            $this->file->iterateRows();
+        }
+        
     }
     
     /**
@@ -84,7 +87,7 @@ class EventHorizon
         // If it's not a valid file path, or we aren't allowed to touch it, then stop before we do anything odd.
         if (!is_file($filePath)) {
             trigger_error('There was an invalid or unreadable file path detected. Truncation has stopped.', E_USER_WARNING);
-            exit();
+            return false;
         }
         
         $this->filePath = $filePath;

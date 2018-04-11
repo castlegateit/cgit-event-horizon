@@ -6,7 +6,7 @@ use Cgit\EventHorizon;
 
 class FileHandler
 {
-    private $pointer;
+    private $pointer = false;
     private $delimiter;
     private $length = 0;
     private $instance;
@@ -48,6 +48,14 @@ class FileHandler
     }
     
     /**
+     * Determines whether the pointer to a file was successfully set.
+     *
+     */
+    public function getPointer() {
+        return $this->pointer;
+    }
+    
+    /**
      * Sets the delimiter used in this CSV. Defaults to a comma.
      *
      * @param $delimiter
@@ -63,7 +71,8 @@ class FileHandler
      */
     public function iterateRows()
     {
-       while (($row = fgetcsv($this->pointer, $this->length, $this->delimiter)) !== FALSE)
+       
+        while (($row = fgetcsv($this->pointer, $this->length, $this->delimiter)) !== FALSE)
         {
             if($this->instance->evalRowTime($row))
             // For each row, get the time data, diff to the current time, and truncate if needed.

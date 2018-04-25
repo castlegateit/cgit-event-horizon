@@ -97,23 +97,24 @@ class EventHorizon
     /**
      * Iterates over a CSV row to find the first cell containing a timestamp. Can be overridden to fetch a specific column.
      *
-     * @param $array $row CSV row, formatted as an array for iteration.
+     * @param $row array CSV row, formatted as an array for iteration.
      *
      * @return \DateTime
      */
     public function retrieveTimeCell($row = null)
     {
         
-        if(isset($this->manualTimestampColumn)) {
+        if(isset($this->manualTimestampColumn)
+           && date_create_from_format($this->timeFormat, $row[$this->manualTimestampColumn])) {
             return $row[$this->manualTimestampColumn];
         }
-        
+    
         foreach($row as $cell) {
-            if(strtotime($cell)) {
+            if(date_create_from_format($this->timeFormat, $cell)) {
                 return $cell;
             }
         }
-     
+        
         trigger_error('There was an invalid or unreadable timestamp detected. Please manually review the
             output at the specified file path. The row will NOT be deleted.', E_USER_WARNING);
         
@@ -124,7 +125,7 @@ class EventHorizon
     /**
      * Evaluates a given row's timestamp to see if the row should be removed or retained.
      *
-     * @param $row Given CSV row.
+     * @param $row array Given CSV row.
      *
      * @return bool True if row is to be kept, false if row should be removed.
      */public function evalRowTime($row) {

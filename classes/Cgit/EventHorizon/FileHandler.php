@@ -22,7 +22,7 @@ class FileHandler
     public function __construct($filePath, $instance)
     {
         $this->instance = $instance;
-        $this->pointer = fopen($filePath, "r+");
+        $this->pointer = fopen($filePath, "r");
         $this->delimiter = ",";
     }
     
@@ -74,9 +74,11 @@ class FileHandler
        
         while (($row = fgetcsv($this->pointer, $this->length, $this->delimiter)) !== FALSE)
         {
-            if($this->instance->evalRowTime($row))
-            // For each row, get the time data, diff to the current time, and truncate if needed.
-            $this->compliantLines[] = $row;
+            
+            if($this->instance->evalRowTime($row)) {
+                // For each row, get the time data, diff to the current time, and truncate if needed.
+                $this->compliantLines[] = $row;
+            }
         }
         
         $this->transpose();

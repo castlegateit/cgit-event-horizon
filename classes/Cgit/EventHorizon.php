@@ -53,10 +53,10 @@ class EventHorizon
      *
      * @return void
      */
-    public function setTimeFormat($format = null)
+    public function setTimeFormat($timeFormat = null)
     {
         if(!is_null($timeFormat)) {
-            $this->timeFormat = $format;
+            $this->timeFormat = $timeFormat;
         }
     }
     

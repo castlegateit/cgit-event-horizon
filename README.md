@@ -44,15 +44,17 @@ $plugin->file->setDelimiter('#');
 #### Example of handling multiple log files #### 
 
 ~~~ php
-$logfiles = [
+$logs = [
     '/home/srv/www/example-site/htdocs/log.csv',
     '/home/srv/www/example-site/htdocs/log2.csv',
     '/home/srv/www/example-site-two/htdocs/log.csv',
     '/home/srv/www/example-site/htdocs/applications.csv',
 ];
 
-foreach($logfiles as $logfile) {
-    $EventHorizon = new \Cgit\EventHorizon('logfile');
-    $EventHorizon->ensureCompliance();
+foreach ($logs as $file) {
+    if (file_exists($file)) {
+        $EventHorizon = new \Cgit\EventHorizon($file);
+        $EventHorizon->ensureCompliance();        
+    }
 }
 ~~~
